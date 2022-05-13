@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-//go test -benchmem -bench . -run=none
+// Benchmark for ArrayStack
 func BenchmarkArrayStackParallel(b *testing.B) {
 	var stack = new(ArrayStack)
 	b.RunParallel(func(pb *testing.PB) {
@@ -25,6 +25,7 @@ func BenchmarkArrayStackParallel(b *testing.B) {
 	})
 }
 
+// Benchmark for LinkStack
 func BenchmarkLinkStackParallel(b *testing.B) {
 	var stack = new(LinkStack)
 	b.RunParallel(func(pb *testing.PB) {

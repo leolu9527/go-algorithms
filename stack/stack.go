@@ -6,10 +6,11 @@ import (
 	"sync"
 )
 
+// Stack 栈
 type Stack interface {
-	Push(s string)
-	Pop() (string, error)
-	Peek() (string, error)
+	Push(s string)         //入栈
+	Pop() (string, error)  //出栈
+	Peek() (string, error) //获取栈顶元素
 }
 
 // IsTest 用于测试
@@ -26,7 +27,7 @@ type ArrayStack struct {
 func (stack *ArrayStack) Push(s string) {
 	stack.lock.Lock()
 	defer stack.lock.Unlock()
-	//插入数据最后
+	//插入数据到栈顶
 	stack.array = append(stack.array, s)
 	if IsTest {
 		fmt.Println("push:", s)
@@ -43,9 +44,11 @@ func (stack *ArrayStack) Pop() (string, error) {
 	}
 	s := stack.array[stack.maxSize-1]
 
-	//切片收缩
+	// 切片收缩
+	//stack.array = stack.array[0 : stack.maxSize-1]
+
+	//这里使用copy函数，copy函数会丢弃原切片中较短最后一个元素
 	destArray := make([]string, stack.maxSize-1, stack.maxSize-1)
-	//这里使用copy函数，copy函数会丢弃原切片中最后一个元素
 	copy(destArray, stack.array)
 	stack.array = destArray
 
@@ -66,6 +69,8 @@ func (stack *ArrayStack) Pop() (string, error) {
 
 // Peek 获取栈顶元素
 func (stack *ArrayStack) Peek() (string, error) {
+	stack.lock.Lock()
+	defer stack.lock.Unlock()
 	if stack.maxSize == 0 {
 		return "", errors.New("empty")
 	}
@@ -96,6 +101,7 @@ func (stack *LinkStack) Push(s string) {
 	stack.size++
 }
 
+// Pop 出栈
 func (stack *LinkStack) Pop() (string, error) {
 	stack.lock.Lock()
 	defer stack.lock.Unlock()
@@ -109,6 +115,7 @@ func (stack *LinkStack) Pop() (string, error) {
 	return s, nil
 }
 
+// Peek 获取栈顶元素
 func (stack *LinkStack) Peek() (string, error) {
 	stack.lock.Lock()
 	defer stack.lock.Unlock()
