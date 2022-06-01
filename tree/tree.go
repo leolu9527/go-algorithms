@@ -1,5 +1,7 @@
 package tree
 
+import "container/list"
+
 type Node struct {
 	Val         int
 	Left, Right *Node
@@ -104,6 +106,34 @@ func indexRecursion(node *Node, level int, index int, result []int) []int {
 
 	if node.Right != nil {
 		result = indexRecursion(node.Right, level+1, 2*index+2, result)
+	}
+
+	return result
+}
+
+// BFS 宽度优先搜索
+func BFS(root *Node) (result [][]int) {
+	if root == nil {
+		return result
+	}
+
+	queue := list.New()
+	queue.PushFront(root)
+
+	for queue.Len() > 0 {
+		var currentLevel []int
+		listLength := queue.Len()
+		for i := 0; i < listLength; i++ {
+			node := queue.Remove(queue.Back()).(*Node)
+			currentLevel = append(currentLevel, node.Val)
+			if node.Left != nil {
+				queue.PushFront(node.Left)
+			}
+			if node.Right != nil {
+				queue.PushFront(node.Right)
+			}
+		}
+		result = append(result, currentLevel)
 	}
 
 	return result
