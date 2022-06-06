@@ -1,6 +1,9 @@
 package tree
 
-import "container/list"
+import (
+	"container/list"
+	"math"
+)
 
 type Node struct {
 	Val         int
@@ -111,7 +114,7 @@ func indexRecursion(node *Node, level int, index int, result []int) []int {
 	return result
 }
 
-// BFS 宽度优先搜索
+// BFS 二叉树宽度优先搜索
 func BFS(root *Node) (result [][]int) {
 	if root == nil {
 		return result
@@ -137,4 +140,93 @@ func BFS(root *Node) (result [][]int) {
 	}
 
 	return result
+}
+
+// IsBST 判断是否是二叉搜索树
+func IsBST(root *Node) bool {
+	if root == nil {
+		return true
+	}
+	return isBSTRecursion(root, math.MinInt64, math.MaxInt64)
+}
+
+func isBSTRecursion(root *Node, min, max int) bool {
+	if root == nil {
+		return true
+	}
+	if min >= root.Val || max <= root.Val {
+		return false
+	}
+	return isBSTRecursion(root.Left, min, root.Val) && isBSTRecursion(root.Right, root.Val, max)
+}
+
+// SearchBSTRecursion 递归查找二叉搜索树
+func SearchBSTRecursion(root *Node, v int) *Node {
+	if root == nil {
+		return nil
+	}
+	if root.Val > v {
+		return SearchBSTRecursion(root.Left, v)
+	} else if root.Val < v {
+		return SearchBSTRecursion(root.Right, v)
+	} else {
+		return root
+	}
+}
+
+// SearchBSTIterate 迭代查找二叉搜索树
+func SearchBSTIterate(root *Node, v int) *Node {
+	for root != nil {
+		if root.Val == v {
+			return root
+		} else if root.Val > v {
+			root = root.Left
+		} else {
+			root = root.Right
+		}
+	}
+
+	return nil
+}
+
+//DeleteBSTNode 二叉搜索树删除（后继节点替代被删除节点）
+func DeleteBSTNode(root *Node, key int) *Node {
+	if root == nil {
+		return nil
+	}
+	if key < root.Val {
+		root.Left = DeleteBSTNode(root.Left, key)
+		return root
+	}
+	if key > root.Val {
+		root.Right = DeleteBSTNode(root.Right, key)
+		return root
+	}
+	//已经查找到目标
+	if root.Right == nil {
+		//右子树为空
+		return root.Left
+	}
+	if root.Left == nil {
+		//左子树为空
+		return root.Right
+	}
+	minNode := root.Right
+	for minNode.Left != nil {
+		//查找后继
+		minNode = minNode.Left
+	}
+	root.Val = minNode.Val
+	root.Right = deleteMinNode(root.Right)
+	return root
+}
+
+func deleteMinNode(root *Node) *Node {
+	if root.Left == nil {
+		pRight := root.Right
+		root.Right = nil
+		return pRight
+	}
+	root.Left = deleteMinNode(root.Left)
+	return root
 }
